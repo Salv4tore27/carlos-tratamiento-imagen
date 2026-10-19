@@ -1,4 +1,4 @@
-# Tratamiento y Mejora de Imágenes Digitales en Visión Artificial
+# Realce de Rango Dinámico y Recuperación Morfológica en un Gamepad Afectado por Oclusión Lumínica Mediante CLAHE en Espacio CIE $L^*a^*b^*$
 
 **Autor:** Carlos Mario Salvatore Ocampo Aguilar  
 **Programa:** Especialización en Inteligencia Artificial — Universidad de Cundinamarca  
