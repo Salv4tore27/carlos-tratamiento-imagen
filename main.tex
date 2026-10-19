@@ -1,0 +1,324 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+\addto\captionsspanish{\renewcommand{\listtablename}{\'Indice de tablas}}
+\usepackage{newtxtext,newtxmath}
+\usepackage[margin=1in,headheight=15pt]{geometry}
+\usepackage{setspace,graphicx,booktabs,tabularx,float,caption,fancyhdr,xurl,hyperref,titlesec,amsmath,listings,xcolor}
+\hypersetup{hidelinks}
+\urlstyle{same}
+\doublespacing
+\setlength{\parindent}{0.5in}
+\setlength{\parskip}{0pt}
+\setcounter{secnumdepth}{0}
+\titleformat{\section}{\normalfont\bfseries\centering}{}{0pt}{}
+\titleformat{\subsection}{\normalfont\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{1.2em}{0.4em}
+\titlespacing*{\subsection}{0pt}{1em}{0.2em}
+\captionsetup[table]{justification=raggedright,singlelinecheck=false,labelsep=newline,labelfont=bf,textfont=it}
+\captionsetup[figure]{justification=raggedright,singlelinecheck=false,labelsep=newline,labelfont=bf,textfont=it}
+\pagestyle{fancy}\fancyhf{}\rhead{\thepage}\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\rhead{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\newcommand{\refapa}[1]{\par\noindent\hangindent=0.5in\hangafter=1 #1\par}
+\newcommand{\notfig}[1]{\par\noindent\small\textit{Nota.} #1\par\normalsize}
+\newcommand{\nota}[1]{\par\noindent\small\textit{Nota.} #1\par\normalsize}
+
+% Configuracion de codigo fuente Python
+\definecolor{codegreen}{rgb}{0.12,0.55,0.18}
+\definecolor{codegray}{rgb}{0.45,0.45,0.45}
+\definecolor{codeblue}{rgb}{0.10,0.20,0.75}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.98}
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen}\itshape,
+    keywordstyle=\color{codeblue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{purple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=6pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    frame=single,
+    rulecolor=\color{codegray}
+}
+\lstset{style=pythonstyle}
+
+\begin{document}\raggedright
+
+\begin{titlepage}\thispagestyle{fancy}
+\begin{center}
+\vspace*{1in}
+{\bfseries Diagn\'ostico y Tratamiento de una Fotograf\'ia con Sombra Intensa en un Control de Videojuegos Mediante Ecualizaci\'on Adaptativa CLAHE en Espacio CIE $L^*a^*b^*$\par}
+\vspace{1.5\baselineskip}
+Carlos Mario Salvatore Ocampo Aguilar\par
+Especializaci\'on en Inteligencia Artificial\par
+Universidad de Cundinamarca\par
+604011 -- Percepci\'on Computacional\par
+R2-A2-S8S9 -- Informe de Resultados de Tratamiento de Imagen\par
+18 de octubre de 2026\par
+\end{center}
+\vfill
+\end{titlepage}
+\setcounter{page}{2}
+
+\begin{center}
+\textbf{Diagn\'ostico y Tratamiento de una Fotograf\'ia con Sombra Intensa en un Control de Videojuegos Mediante Ecualizaci\'on Adaptativa CLAHE en Espacio CIE $L^*a^*b^*$}
+\end{center}
+
+\section{Problema y Contextualizaci\'on en Percepci\'on Computacional}
+En la cadena operativa de cualquier sistema de visi\'on artificial, la etapa de adquisici\'on \'optica determina el l\'imite te\'orico superior del desempe\~no alcanzable por las fases subsecuentes de detecci\'on de bordes, extracci\'on de descriptores y clasificaci\'on sem\'antica (Gonzalez \& Woods, 2018; Szeliski, 2022). Factores no controlados del entorno f\'isico, tales como iluminaciones deficientes, fuentes de luz duras que arrojan sombras pronunciadas y desplazamientos relativos entre el sensor y la escena, introducen perturbaciones severas en la se\~nal bidimensional capturada por sensores CMOS o CCD. En particular, las sombras oclusivas reducen cr\'iticamente el rango din\'amico local de los objetos, comprimiendo las transiciones tonales hacia valores cercanos al nivel de ruido del sensor y enmascarando caracter\'isticas morfol\'ogicas clave.
+
+De acuerdo con los objetivos formativos del curso de Percepci\'on Computacional (Universidad de Cundinamarca, s.~f.), el prop\'osito de este trabajo no radica en la aplicaci\'on arbitraria de filtros predeterminados, sino en llevar a cabo un proceso sistem\'atico de ingenier\'ia: capturar un conjunto experimental de im\'agenes de un mismo objeto bajo condiciones ambientales contrastantes, diagnosticar cuantitativamente sus par\'ametros fotom\'etricos y espaciales, seleccionar de manera fundamentada la captura que plantea el mayor reto t\'ecnico recuperable y dise\~nar una soluci\'on algor\'itmica de preprocesamiento basada en visi\'on por computador para restaurar la legibilidad de la informaci\'on visual.
+
+Para este estudio se seleccion\'o como objeto de an\'alisis un control inal\'ambrico para videojuegos (gamepad Machenike G5 Pro). Este dispositivo cuenta con una geometr\'ia tridimensional compleja, superficies pl\'asticas blancas, cruceta direccional (D-pad), botones mec\'anicos, palancas anal\'ogicas con sensores de efecto Hall e iluminaci\'on interna decorativa. El lote experimental est\'a compuesto por cinco capturas fotogr\'aficas: (a) captura de referencia con iluminaci\'on difusa equilibrada; (b) iluminaci\'on rasante desigual con gradiente de penumbra lateral; (c) sombra intensa arrojada directamente sobre la cruceta y el hemisferio izquierdo del mando; (d) degradaci\'on por movimiento cin\'etico del sensor; y (e) perspectiva en \'angulo lateral mostrando la volumetr\'ia y contornos de ensamble.
+
+\section{Metodolog\'ia y Arquitectura del Script de Procesamiento}
+El an\'alisis diagn\'ostico y el algoritmo de correcci\'on se implementaron mediante un script modular y determinista en Python 3.14.7 utilizando las bibliotecas OpenCV 5.0.0 y NumPy 2.5.2 (\texttt{analisis\_tratamiento.py}). El software garantiza la integridad de los datos de entrada, procesando los archivos originales en disco en modo de solo lectura.
+
+\subsection{M\'odulos y Flujo de Ejecuci\'on}
+El pipeline de procesamiento se articula en las siguientes etapas funcionales:
+\begin{enumerate}
+    \item \texttt{cargar(ruta)}: Carga robusta de im\'agenes matriciales en espacio de color BGR nativo, verificando la persistencia y dimensiones del archivo.
+    \item \texttt{medir(imagen)}: Transforma la se\~nal a escala de grises de 8 bits y calcula simult\'aneamente nueve indicadores cuantitativos (dimensiones en p\'ixeles, luminancia media, desviaci\'on est\'andar, percentiles 5 y 95, proporci\'on de p\'ixeles en penumbra profunda, varianza del Laplaciano y densidad de bordes de Canny).
+    \item \texttt{recortar(imagen, caja)}: Extrae una regi\'on de inter\'es fija (ROI, \textit{Region of Interest}) correspondiente a la cruceta y los botones centrales del mando con coordenadas $(x_0, y_0, x_1, y_1) = (200, 220, 750, 780)$, lo cual permite aislar cuantitativamente la zona anat\'omica donde recae el impacto de la sombra.
+    \item \texttt{corregir\_sombra(imagen)}: Aplica ecualizaci\'on adaptativa de histograma con limitaci\'on de contraste (CLAHE) en el espacio ortogonal CIE $L^*a^*b^*$.
+    \item \texttt{tarjeta()} y \texttt{main()}: Componen los mosaicos gr\'aficos comparativos (\texttt{cinco\_capturas.png} y \texttt{comparacion\_tratamiento.png}) y exportan las mediciones en los archivos \texttt{metricas.csv} y \texttt{metricas.json}.
+\end{enumerate}
+
+\subsection{Formulaci\'on Matem\'atica de los Indicadores}
+Para garantizar la objetividad del diagn\'ostico se definieron anal\'iticamente las siguientes m\'etricas:
+\begin{enumerate}
+    \item \textbf{Luminancia media ($\mu$):} Cuantifica el nivel de brillo general de la se\~nal discreta de intensidad en el intervalo $[0, 255]$:
+    \begin{equation}
+        \mu = \frac{1}{M \cdot N} \sum_{x=0}^{M-1} \sum_{y=0}^{N-1} I(x,y)
+    \end{equation}
+    donde $I(x,y)$ es el valor de reflectancia monocrom\'atica del p\'ixel en las coordenadas espaciales $(x,y)$, sobre una matriz de tama\~no $M \times N$.
+    \item \textbf{Contraste global ($\sigma$):} Desviaci\'on est\'andar de las intensidades luminosas, representando el rango de dispersi\'on din\'amica en la escena:
+    \begin{equation}
+        \sigma = \sqrt{\frac{1}{M \cdot N} \sum_{x=0}^{M-1} \sum_{y=0}^{N-1} \left( I(x,y) - \mu \right)^2}
+    \end{equation}
+    \item \textbf{Porcentaje de p\'ixeles oscuros ($P_{\text{osc}}$):} Fracci\'on porcentual de p\'ixeles confinados en el r\'egimen de subexposici\'on severa ($I(x,y) < 50$):
+    \begin{equation}
+        P_{\text{osc}} = \frac{100}{M \cdot N} \sum_{x=0}^{M-1} \sum_{y=0}^{N-1} \mathbb{I}\left(I(x,y) < 50\right)
+    \end{equation}
+    donde $\mathbb{I}(\cdot)$ denota la funci\'on indicadora booleana.
+    \item \textbf{Varianza del Laplaciano ($\sigma^2_{\nabla^2}$):} Indicador cl\'asico de contenido de altas frecuencias espaciales y transiciones abruptas de gradiente, utilizado formalmente como estimador de nitidez y enfoque \'optico (Pech-Pacheco et al., 2000). Se obtiene mediante la convoluci\'on bidimensional con el kernel Laplaciano de $3 \times 3$:
+    \begin{equation}
+        \nabla^2 I(x,y) \approx I(x+1,y) + I(x-1,y) + I(x,y+1) + I(x,y-1) - 4I(x,y)
+    \end{equation}
+    \begin{equation}
+        \sigma^2_{\nabla^2} = \frac{1}{M \cdot N} \sum_{x=0}^{M-1} \sum_{y=0}^{N-1} \left( \nabla^2 I(x,y) - \bar{\nabla}^2 \right)^2
+    \end{equation}
+    Es oportuno resaltar que este descriptor no representa una medida absoluta de calidad subjetiva, ya que texturas complejas o ruido t\'ermico tambi\'en incrementan la energ\'ia de altas frecuencias (OpenCV, s.~f.-b).
+    \item \textbf{Densidad de contornos Canny ($D_{\text{canny}}$):} Proporci\'on porcentual de p\'ixeles reconocidos como bordes estructurales luego de aplicar supresi\'on de no-m\'aximos e hist\'eresis con umbrales $T_1 = 100$ y $T_2 = 200$ (Canny, 1986):
+    \begin{equation}
+        D_{\text{canny}} = \frac{100}{M \cdot N} \sum_{x=0}^{M-1} \sum_{y=0}^{N-1} \mathbb{I}\left(\text{Canny}(I(x,y)) > 0\right)
+    \end{equation}
+\end{enumerate}
+
+\clearpage
+\begin{figure}[H]
+\noindent\textbf{Figura 1}\par
+\noindent\textit{Panel de las cinco capturas experimentales del control de videojuegos}\par
+\IfFileExists{resultados/cinco_capturas.png}{\centering\includegraphics[width=0.82\textwidth,height=0.74\textheight,keepaspectratio]{resultados/cinco_capturas.png}}{\centering\includegraphics[width=0.82\textwidth,height=0.74\textheight,keepaspectratio]{resultados/cuatro_capturas.png}}
+\notfig{Mosaico experimental generado por el script \texttt{analisis\_tratamiento.py}. Fila superior: 1. Referencia, 2. Luz desigual y 3. Sombra intensa. Fila inferior: 4. Movimiento y 5. Angulo / Perspectiva. Se registran las distintas condiciones f\'isicas analizadas.}
+\end{figure}
+
+\clearpage
+\section{Diagn\'ostico Cuantitativo del Banco de Im\'agenes}
+La Tabla~\ref{tab:diagnostico} sintetiza las caracter\'isticas t\'ecnicas exigidas por la gu\'ia acad\'emica: formato, peso en disco, resoluci\'on matricial, n\'umero de canales crom\'aticos, brillo, contraste, nitidez y densidad de bordes para cada una de las cinco capturas del lote.
+
+\begin{table}[H]
+\caption{Diagn\'ostico integral y par\'ametros t\'ecnicos de las cinco capturas del dataset}\label{tab:diagnostico}
+\begin{singlespace}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l c r c c r r r r}
+\toprule
+Captura & Formato & Peso (KB) & Resoluci\'on & Can. & $\mu$ (Brillo) & $\sigma$ (Contr.) & $\sigma^2_{\nabla^2}$ (Nit.) & Bordes (\%) \\
+\midrule
+1. Referencia & PNG & 963 & $768\times1024$ & 3 & 68.81 & 45.33 & 937.13 & 2.07 \\
+2. Luz desigual & PNG & 574 & $768\times1024$ & 3 & 38.32 & 41.12 & 642.82 & 1.25 \\
+3. Sombra intensa & PNG & 390 & $768\times1024$ & 3 & 25.53 & 36.92 & 429.37 & 0.83 \\
+4. Movimiento & JPEG & 912 & $768\times1024$ & 3 & 67.28 & 47.37 & 361.32 & 1.14 \\
+5. Perspectiva & PNG & 862 & $768\times1024$ & 3 & 74.80 & 58.98 & 556.55 & 1.15 \\
+\bottomrule
+\end{tabular}%
+}
+\end{singlespace}
+\nota{$\mu$: luminancia media en escala 0--255. $\sigma$: contraste global (desviaci\'on est\'andar). $\sigma^2_{\nabla^2}$: varianza del Laplaciano (estimador de nitidez). Bordes: proporci\'on de p\'ixeles clasificados como contorno mediante el detector Canny ($T_1=100, T_2=200$). Can.: canales crom\'aticos (BGR de 8 bits por canal). Datos calculados por \texttt{analisis\_tratamiento.py}.}
+\end{table}
+
+\subsection{An\'alisis Comparativo y Elecci\'on de la Captura Problem\'atica}
+La comparaci\'on de las m\'etricas cuantitativas sustenta s\'olidamente la decisi\'on de intervenci\'on:
+\begin{enumerate}
+    \item \textbf{Captura de Referencia:} Presenta un balance \'optimo para la visi\'on computacional, con un brillo medio de 68.81, una varianza laplaciana de 937.13 y un 2.07\% de contornos detectables. Los perfiles geom\'etricos de la cruceta y botones mec\'anicos son f\'acilmente segmentables.
+    \item \textbf{Captura con Luz Desigual:} Exhibe una reducci\'on en la luminancia media ($\mu = 38.32$) y un 77.60\% de p\'ixeles oscuros. No obstante, conserva una varianza laplaciana respetable (642.82) y 1.25\% de bordes, debido a que el haz de luz oblicuo acent\'ua las aristas del mando en el lado derecho.
+    \item \textbf{Captura con Movimiento:} A pesar de mantener un brillo global adecuado ($\mu = 67.28$), el desplazamiento angular del dispositivo durante el disparo caus\'o un desenfoque cin\'etico irreversible. La varianza laplaciana cay\'o al m\'inimo de todo el banco (361.32). Esta captura fue deliberadamente descartada para el tratamiento de realce: el movimiento constituye una degradaci\'on convolutiva de fase espacial desconocida; intentar compensarla con filtros pasa-altas convencionales no hace m\'as que propagar ruido de alta frecuencia y artefactos de anillo (\textit{ringing}) sin restaurar bordes aut\'enticos (Szeliski, 2022).
+    \item \textbf{Captura con Perspectiva y \'Angulo:} Muestra el mayor contraste din\'amico ($\sigma = 58.98$) y brillo medio de 74.80. La vista isom\'etrica destaca el contorno ergon\'omico de los cuernos del mando y los gatillos superiores, con 556.55 de varianza laplaciana.
+    \item \textbf{Captura con Sombra Intensa (Imagen Seleccionada):} Registra los valores m\'as cr\'iticos de degradaci\'on fotom\'etrica: luminancia media de apenas 25.53, contraste m\'inimo de 36.92 y un alarmante 81.67\% de p\'ixeles confinados por debajo del umbral de subexposici\'on. La densidad de bordes se desploma al 0.83\%. La sombra ocluye directamente la cruceta direccional, impidiendo que un detector morfol\'ogico reconozca la posici\'on de los controles.
+\end{enumerate}
+
+Por consiguiente, se seleccion\'o la \textbf{Captura 3 (Sombra intensa)}: a diferencia del barrido por movimiento, la informaci\'on estructural de los botones sigue existiendo f\'isicamente en la matriz del sensor, permitiendo que una t\'ecnica de expansi\'on adaptativa de rango din\'amico local restaure su visibilidad sin inventar artefactos.
+
+\section{Dise\~no y Fundamentaci\'on Matem\'atica del Tratamiento CLAHE}
+El objetivo de la intervenci\'on es expandir el contraste local en la zona bajo penumbra para restaurar la legibilidad de la cruceta y botones, evitando la sobreexposici\'on de las partes iluminadas y preservando estrictamente la colorimetr\'ia original de la carcasa.
+
+\subsection{Limitaciones de la Ecualizaci\'on Global de Histograma}
+La ecualizaci\'on global convencional calcula una funci\'on de transferencia mon\'otona basada en la funci\'on de distribuci\'on acumulada (CDF) de toda la escena:
+\begin{equation}
+    s_k = T(r_k) = (L-1) \sum_{j=0}^k p_r(r_j)
+\end{equation}
+donde $p_r(r_j)$ es la probabilidad del nivel de gris $r_j$. En escenas con sombras concentradas, este operador amplifica desproporcionadamente las \'areas que ya reciben iluminaci\'on, saturando los p\'ixeles a blanco m\'aximo (255) y disparando el ruido t\'ermico en los fondos homog\'eneos (Bradski \& Kaehler, 2008; Gonzalez \& Woods, 2018).
+
+\subsection{Ecualizaci\'on Adaptativa con L\'imite de Contraste (CLAHE)}
+Para superar esta limitaci\'on, se implement\'o la t\'ecnica CLAHE (\textit{Contrast Limited Adaptive Histogram Equalization}; Zuiderveld, 1994). El algoritmo particiona la imagen en una cuadr\'icula de $8 \times 8$ bloques contextuales no solapados (\textit{tiles}). En cada bloque se computa el histograma local y se impone un umbral de corte anal\'itico (\textit{clipLimit}):
+\begin{equation}
+    \beta = \left(\frac{M_b \cdot N_b}{N_{\text{bins}}}\right) \cdot \text{clipLimit}
+\end{equation}
+donde $N_{\text{bins}} = 256$ y se parametriz\'o $\text{clipLimit} = 2.0$. Los p\'ixeles que sobrepasan la cota $\beta$ son truncados y redistribuidos uniformemente en el histograma antes de computar la transformaci\'on local. De este modo se limita matem\'aticamente la pendiente de la funci\'on de mapeo tonal, impidiendo la generaci\'on de ruido en regiones uniformes (OpenCV, s.~f.-a).
+
+Finalmente, los valores de intensidad de los p\'ixeles intermedios se calculan mediante interpolaci\'on bilineal continua a partir de los cuatro bloques circundantes, eliminando discontinuidades visuales en los l\'imites de cada celda.
+
+\subsection{Desacoplamiento Crom\'atico en Espacio CIE $L^*a^*b^*$}
+Modificar directamente los canales RGB o BGR genera severas aberraciones crom\'aticas, ya que la alteraci\'on de las proporciones relativas de los colores primarios provoca cambios de tono y sobre-saturaciones artificiales (Fairchild, 2013). Para evitarlo, el dise\~no desacopla la informaci\'on de brillo de la informaci\'on crom\'atica mediante la transformaci\'on al espacio ortogonal CIE $L^*a^*b^*$:
+\begin{enumerate}
+    \item Se convierte la matriz BGR al espacio tridimensional $L^*a^*b^*$, donde el canal $L^*$ codifica la luminancia perceptualmente uniforme, y los ejes $a^*$ (verde-rojo) y $b^*$ (azul-amarillo) representan las coordenadas crom\'aticas oponentes.
+    \item Se aplica el operador CLAHE exclusivamente sobre la componente $L^*$, generando la matriz mejorada $L^*_{\text{mod}}$.
+    \item Los canales crom\'aticos $a^*$ y $b^*$ se mantienen estrictamente inalterados.
+    \item Se fusionan los canales $(L^*_{\text{mod}}, a^*, b^*)$ y se reconvierte la se\~nal al espacio BGR para la exportaci\'on de \texttt{sombra\_tratada.png}.
+\end{enumerate}
+
+\subsection{Implementaci\'on en Python}
+El Listing~\ref{lst:clahe} muestra la implementaci\'on exacta utilizada en el script aut\'onomo:
+
+\begin{lstlisting}[language=Python, caption={Tratamiento CLAHE sobre el canal L en espacio Lab con OpenCV.}, label={lst:clahe}]
+def corregir_sombra(imagen: np.ndarray) -> np.ndarray:
+    """Aplica CLAHE exclusivamente al canal L del espacio CIE Lab.
+    
+    Preserva intactos los canales cromaticos A y B para evitar
+    virajes tonales y aberraciones de color en el mando.
+    """
+    # 1. Conversion de espacio de color BGR a CIE Lab
+    lab = cv2.cvtColor(imagen, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    
+    # 2. Instanciacion de CLAHE con grilla 8x8 y limite clipLimit=2.0
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    l_corregida = clahe.apply(l)
+    
+    # 3. Fusion de canales con cromaticidad intacta y reconversion a BGR
+    imagen_fusionada = cv2.merge((l_corregida, a, b))
+    return cv2.cvtColor(imagen_fusionada, cv2.COLOR_LAB2BGR)
+\end{lstlisting}
+
+\section{Evaluaci\'on Experimental de Resultados y An\'alisis Comparativo}
+Para verificar emp\'iricamente la eficacia del preprocesamiento, se extrajeron m\'etricas cuantitativas tanto para la totalidad del encuadre ($768\times1024$) como para la regi\'on de inter\'es cr\'itica (ROI de $550\times560$ p\'ixeles centrada en la cruceta y botones mec\'anicos). Los resultados comparativos se detallan en la Tabla~\ref{tab:resultado}.
+
+\begin{table}[H]
+\caption{Comparaci\'on cuantitativa de la fotograf\'ia con sombra antes y despu\'es de CLAHE}\label{tab:resultado}
+\begin{singlespace}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrr}
+\toprule
+Regi\'on y Condici\'on & $\mu$ (Lumin.) & $\sigma$ (Contr.) & $P_5$ & $P_{\text{osc}}$ (\%) & $\sigma^2_{\nabla^2}$ (Nit.) & Bordes (\%) \\
+\midrule
+Completa, Antes & 25.53 & 36.92 & 1.00 & 81.67 & 429.37 & 0.83 \\
+Completa, Despu\'es (CLAHE) & 37.57 & 45.29 & 6.00 & 76.15 & 1003.05 & 1.39 \\
+Control (ROI), Antes & 44.83 & 44.10 & 3.00 & 64.34 & 981.81 & 2.01 \\
+Control (ROI), Despu\'es (CLAHE) & 61.31 & 53.29 & 9.00 & 53.39 & 2331.25 & 3.41 \\
+\bottomrule
+\end{tabular}%
+}
+\end{singlespace}
+\nota{La regi\'on del mando corresponde a las coordenadas delimitadoras $(200, 220, 750, 780)$. $P_5$: percentil 5 de intensidad. $P_{\text{osc}}$: porcentaje de p\'ixeles en subexposici\'on profunda ($< 50$). Cifras obtenidas por \texttt{analisis\_tratamiento.py}.}
+\end{table}
+
+\subsection{Interpretaci\'on de las M\'etricas Cuantitativas}
+El examen riguroso de las cifras evidencia una recuperaci\'on fotom\'etrica y estructural notable:
+\begin{enumerate}
+    \item \textbf{Recuperaci\'on de luminancia y visibilidad:} En la regi\'on funcional del control (ROI), el brillo medio aument\'o sustancialmente de 44.83 a 61.31 (+16.48 unidades de reflectancia media). La proporci\'on de p\'ixeles severamente oscuros disminuy\'o en 10.95 puntos porcentuales (de 64.34\% a 53.39\%), y el percentil 5 ascendi\'o de 3.0 a 9.0, sacando la textura pl\'astica y los pulsadores del umbral de ceguera del sensor.
+    \item \textbf{Exponencial ganancia de nitidez y bordes:} En la zona del mando, la varianza del Laplaciano se multiplic\'o por m\'as de 2.3 veces, pasando de 981.81 a 2331.25. De forma convergente, la densidad de bordes detectables mediante Canny se increment\'o de 2.01\% a 3.41\%. Este salto confirma que los l\'imites geom\'etricos de la cruceta y los botones ahora exhiben transiciones de gradiente suficientes para algoritmos de segmentaci\'on por contornos activos o redes neuronales convolucionales.
+    \item \textbf{Conservaci\'on de altas luces y colorimetr\'ia:} En la imagen completa, el contraste global ($\sigma$) pas\'o moderadamente de 36.92 a 45.29 sin provocar saturaci\'on en las zonas iluminadas de la mano y la carcasa blanca. El mantenimiento estricto de las matrices $a^*$ y $b^*$ preserv\'o con exactitud el matiz original del dispositivo.
+\end{enumerate}
+
+La Figura~\ref{fig:comparacion} ilustra la comparativa visual entre la toma de referencia, la imagen con sombra original y el resultado procesado.
+
+\clearpage
+\begin{figure}[H]
+\noindent\textbf{Figura 2}\par
+\noindent\textit{Comparaci\'on visual: Captura de referencia, toma con sombra intensa y versi\'on tratada}\par
+\centering\includegraphics[width=\textwidth,height=0.40\textheight,keepaspectratio]{resultados/comparacion_tratamiento.png}
+\notfig{Mosaico horizontal generado por \texttt{analisis\_tratamiento.py}. La captura de referencia establece la l\'inea base geom\'etrica del dispositivo. La versi\'on tratada restaura la visibilidad y definici\'on del D-pad y botones mec\'anicos sin artefactos crom\'aticos.}
+\label{fig:comparacion}
+\end{figure}
+
+\section{Discusi\'on Cr\'itica, Conclusiones y Recomendaciones}
+La confrontaci\'on entre los datos cuantitativos y la observaci\'on experimental conduce a las siguientes conclusiones t\'ecnicas:
+
+\subsection{L\'imites F\'isicos de la Adquisici\'on \'Optica}
+Es esencial se\~nalar que ning\'un algoritmo de preprocesamiento digital puede reconstituir informaci\'on fot\'onica que nunca incidi\'o sobre los elementos sensores. Si bien CLAHE redistribuye con \'exito la se\~nal disponible y recupera la legibilidad del mando, en aquellas microrregiones donde la iluminaci\'on descendi\'o por debajo del piso de ruido del sensor, la se\~nal amplificada puede manifestar una leve granularidad. Por ende, el software act\'ua como un compensador de resiliencia, pero no reemplaza el dise\~no \'optico del sistema.
+
+\subsection{Conclusiones Principales}
+\begin{enumerate}
+    \item \textbf{Pertinencia del procesamiento adaptativo desacoplado:} La aplicaci\'on de CLAHE en el espacio de color CIE $L^*a^*b^*$ demostr\'o ser una decisi\'on de ingenier\'ia \'optima frente a m\'etodos de ecualizaci\'on global. Elev\'o la nitidez local en m\'as de un 137\% y redujo casi 11 puntos la subexposici\'on en la cruceta sin inducir alteraciones de tono en el pl\'astico blanco del dispositivo.
+    \item \textbf{Discriminaci\'on de degradaciones en la fase de diagn\'ostico:} Se ratific\'o la necesidad de categorizar el origen f\'isico del defecto antes de intervenir la se\~nal. La captura con movimiento fue adecuadamente segregada de la pipeline de contraste, evitando intervenciones espaciales contraproducentes.
+    \item \textbf{Criterio de preprocesamiento en sistemas de visi\'on:} El diagn\'ostico automatizado mediante par\'ametros objetivos ($\mu, \sigma, \sigma^2_{\nabla^2}$) constituye una fase de control de calidad ineludible en arquitecturas de visi\'on artificial en tiempo real.
+\end{enumerate}
+
+\subsection{Recomendaciones Operativas}
+\begin{itemize}
+    \item \textbf{Iluminaci\'on controlada en hardware:} En aplicaciones industriales de inspecci\'on automatizada de componentes electr\'onicos, se recomienda incorporar difusores tipo domo o fuentes de luz estructurada estrobosc\'opica para prevenir sombras proyectadas duras en la adquisici\'on.
+    \item \textbf{Parametrizaci\'on din\'amica:} En entornos operativos variables, el par\'ametro \texttt{clipLimit} de CLAHE deber\'ia modularse autom\'aticamente en funci\'on de la fracci\'on de p\'ixeles oscuros $P_{\text{osc}}$ detectados en la fase diagn\'ostica inicial.
+\end{itemize}
+
+\section{Disponibilidad del C\'odigo Fuente y Reproducibilidad en GitHub}
+En cumplimiento estricto del criterio institucional de reproducibilidad y apertura cient\'ifica, el c\'odigo fuente, los datos cuantitativos y el informe acad\'emico se encuentran disponibles p\'ublicamente en:
+\begin{center}
+\textbf{Repositorio en GitHub:}\par
+\url{https://github.com/Salv4tore27/carlos-tratamiento-imagen}
+\end{center}
+
+\subsection{Estructura del Repositorio}
+El repositorio est\'a configurado de acuerdo con buenas pr\'acticas de ingenier\'ia de software:
+\begin{itemize}
+    \item \texttt{fotos/}: Capturas fotogr\'aficas originales sin alterar (\texttt{referencia.png}, \texttt{luz\_desigual.png}, \texttt{sombra\_fuerte.png}, \texttt{movimiento.jpg}, \texttt{angulo\_perspectiva.png}).
+    \item \texttt{resultados/}: Artefactos procesados (\texttt{sombra\_tratada.png}, \texttt{cinco\_capturas.png}, \texttt{comparacion\_tratamiento.png}, \texttt{metricas.csv} y \texttt{metricas.json}).
+    \item \texttt{analisis\_tratamiento.py}: Script ejecutable principal de diagn\'ostico y correcci\'on.
+    \item \texttt{requirements.txt}: Requerimientos y versiones de dependencias del entorno.
+    \item \texttt{README.md}: Documentaci\'on descriptiva y gu\'ia de ejecuci\'on.
+    \item \texttt{main.tex}: C\'odigo fuente LaTeX del informe editable en Overleaf (\url{https://www.overleaf.com/project/6ad566f910500e05f7c238dd}).
+\end{itemize}
+
+Para clonar y ejecutar el entorno de pruebas localmente:
+\begin{lstlisting}[language=bash]
+git clone https://github.com/Salv4tore27/carlos-tratamiento-imagen.git
+cd carlos-tratamiento-imagen
+python -m pip install -r requirements.txt
+python analisis_tratamiento.py
+\end{lstlisting}
+
+\newpage
+\section{Referencias Bibliogr\'aficas}
+\refapa{Bradski, G., \& Kaehler, A. (2008). \textit{Learning OpenCV: Computer vision with the OpenCV library}. O'Reilly Media.}
+\refapa{Canny, J. (1986). A computational approach to edge detection. \textit{IEEE Transactions on Pattern Analysis and Machine Intelligence}, PAMI-8(6), 679--698. \url{https://doi.org/10.1109/TPAMI.1986.4767851}}
+\refapa{Fairchild, M. D. (2013). \textit{Color appearance models} (3.\textordfeminine{} ed.). John Wiley \& Sons. \url{https://doi.org/10.1002/9781118653128}}
+\refapa{Gonzalez, R. C., \& Woods, R. E. (2018). \textit{Digital image processing} (4.\textordfeminine{} ed.). Pearson.}
+\refapa{OpenCV. (s.~f.-a). \textit{Histograms -- 2: Histogram equalization}. OpenCV documentation. \url{https://docs.opencv.org/4.x/d5/daf/tutorial_py_histogram_equalization.html}}
+\refapa{OpenCV. (s.~f.-b). \textit{Laplace operator}. OpenCV documentation. \url{https://docs.opencv.org/4.x/d5/db5/tutorial_laplace_operator.html}}
+\refapa{Pech-Pacheco, J. L., Crist\'obal, G., Chamorro-Mart\'inez, J., \& Fern\'andez-Valdivia, J. (2000). Diatom autofocusing in brightfield microscopy: A comparative study. \textit{Proceedings 15th International Conference on Pattern Recognition (ICPR)}, 3, 314--317. \url{https://doi.org/10.1109/ICPR.2000.903548}}
+\refapa{Szeliski, R. (2022). \textit{Computer vision: Algorithms and applications} (2.\textordfeminine{} ed.). Springer. \url{https://doi.org/10.1007/978-3-030-34372-9}}
+\refapa{Universidad de Cundinamarca. (s.~f.). \textit{R2-A2-S8S9: Informe de resultados de tratamiento de imagen} [Consigna oficial de la actividad, curso 604011 -- Percepci\'on Computacional]. Aula Virtual de Posgrados.}
+\refapa{Zuiderveld, K. (1994). Contrast limited adaptive histogram equalization. En P. S. Heckbert (Ed.), \textit{Graphics Gems IV} (pp. 474--485). Academic Press. \url{https://doi.org/10.1016/B978-0-12-336156-1.50061-6}}
+
+\end{document}
